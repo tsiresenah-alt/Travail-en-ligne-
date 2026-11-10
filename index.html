@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mon Site de Travail en Ligne</title>
+    <style>
+        body { font-family: Arial, sans-serif; background: #f4f7f6; margin: 0; padding: 20px; text-align: center; }
+        .card { background: white; max-width: 400px; margin: 30px auto; padding: 20px; border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+        .balance { font-size: 28px; color: #27ae60; font-weight: bold; margin: 15px 0; }
+        button { background: #3498db; color: white; border: none; padding: 12px 20px; font-size: 16px; border-radius: 5px; cursor: pointer; width: 100%; margin-top: 10px; }
+        button:hover { background: #2980b9; }
+        .task-btn { background: #e67e22; }
+        .task-btn:hover { background: #d35400; }
+    </style>
+</head>
+<body>
+
+    <div class="card">
+        <h2>Espace Travail en Ligne</h2>
+        <p>Utilisateur : <span id="user-email">Chargement...</span></p>
+        
+        <h3>Solde d'argent virtuel :</h3>
+        <div class="balance"><span id="user-balance">0</span> Ar</div>
+
+        <button class="task-btn" onclick="accomplirTache()">Faire une tâche (+500 Ar)</button>
+        <button onclick="simulerRetrait()">Demander un retrait Mobile Money</button>
+    </div>
+
+    <!-- SDK Firebase (Version modulaire compatible web moderne) -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getFirestore, doc, getDoc, setDoc, updateDoc, increment } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        // 1. Remplacez ces informations par les vôtres obtenues sur la console Firebase
+        const firebaseConfig = {
+            apiKey: "VOTRE_API_KEY",
+            authDomain: "votre-projet.firebaseapp.com",
+            projectId: "votre-projet",
+            storageBucket: "votre-projet.appspot.com",
+            messagingSenderId: "ID_SENDER",
+            appId: "VOTRE_APP_ID"
+        };
+
+        // Initialisation de Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // ID de test pour l'utilisateur
+        const userId = "utilisateur_test_123";
+        const userRef = doc(db, "utilisateurs", userId);
+
+        async function chargerProfil() {
+            document.getElementById("user-email").innerText = userId;
+            const docSnap = await getDoc(userRef);
+            
+            if (docSnap.exists()) {
+                document.getElementById("user-balance").innerText = docSnap.data().solde || 0;
+            } else {
+                await setDoc(userRef, { solde: 0 });
+                document.getElementById("user-balance").innerText = 0;
+            }
+        }
+
+        window.accomplirTache = async function() {
+            try {
+                await updateDoc(userRef, {
+                    solde: increment(500)
+                });
+                alert("Tâche validée ! +500 Ar ajoutés.");
+                chargerProfil();
+            } catch (error) {
+                console.error("Erreur lors de la tâche : ", error);
+            }
+        };
+
+        window.simulerRetrait = async function() {
+            const docSnap = await getDoc(userRef);
+            const soldeActuel = docSnap.data().solde || 0;
+            
+            if (soldeActuel >= 5000) {
+                alert("Demande de retrait Mobile Money envoyée avec succès !");
+            } else {
+                alert("Solde insuffisant. Il vous faut au moins 5000 Ar pour effectuer un retrait.");
+            }
+        };
+
+        chargerProfil();
+    </script>
+</body>
+</html>
