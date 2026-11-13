@@ -3,89 +3,100 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mon Site de Travail en Ligne</title>
+    <title>Inscription Bossman</title>
     <style>
-        body { font-family: Arial, sans-serif; background: #f4f7f6; margin: 0; padding: 20px; text-align: center; }
-        .card { background: white; max-width: 400px; margin: 30px auto; padding: 20px; border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
-        .balance { font-size: 28px; color: #27ae60; font-weight: bold; margin: 15px 0; }
-        button { background: #3498db; color: white; border: none; padding: 12px 20px; font-size: 16px; border-radius: 5px; cursor: pointer; width: 100%; margin-top: 10px; }
-        button:hover { background: #2980b9; }
-        .task-btn { background: #e67e22; }
-        .task-btn:hover { background: #d35400; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: sans-serif; }
+        body { background-color: #0f172a; color: #ffffff; display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; }
+        .container { background-color: #1e293b; padding: 30px; border-radius: 16px; width: 100%; max-width: 400px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5); }
+        h1 { text-align: center; color: #22c55e; margin-bottom: 25px; font-size: 24px; letter-spacing: 1px; }
+        h2 { font-size: 18px; margin-bottom: 20px; text-align: center; color: #cbd5e1; }
+        .form-group { margin-bottom: 18px; }
+        label { display: block; font-size: 14px; margin-bottom: 8px; color: #94a3b8; }
+        input { width: 100%; padding: 12px 15px; background-color: #0f172a; border: 1px solid #334155; border-radius: 8px; color: #ffffff; font-size: 14px; outline: none; }
+        input:focus { border-color: #eab308; }
+        button { width: 100%; padding: 14px; background-color: #eab308; border: none; border-radius: 8px; color: #000000; font-weight: bold; font-size: 16px; cursor: pointer; margin-top: 10px; }
+        button:hover { background-color: #ca8a04; }
     </style>
 </head>
 <body>
 
-    <div class="card">
-        <h2>Espace Travail en Ligne</h2>
-        <p>Utilisateur : <span id="user-email">Chargement...</span></p>
+    <div class="container">
+        <h1>BIENVENUE</h1>
+        <h2>Inscription Bossman</h2>
         
-        <h3>Solde d'argent virtuel :</h3>
-        <div class="balance"><span id="user-balance">0</span> Ar</div>
-
-        <button class="task-btn" onclick="accomplirTache()">Faire une tâche (+500 Ar)</button>
-        <button onclick="simulerRetrait()">Demander un retrait Mobile Money</button>
+        <form id="inscriptionForm">
+            <div class="form-group">
+                <label for="username">Nom d'utilisateur</label>
+                <input type="text" id="username" required placeholder="Votre nom (lettres uniquement)">
+            </div>
+            
+            <div class="form-group">
+                <label for="phone">Numéro</label>
+                <input type="tel" id="phone" pattern="[0-9]{10}" maxlength="10" required placeholder="Ex: 0341234567 (10 chiffres)">
+            </div>
+            
+            <div class="form-group">
+                <label for="password">Mot de passe (Mdp)</label>
+                <input type="password" id="password" minlength="6" required placeholder="Min. 6 caractères (lettres et chiffres)">
+            </div>
+            
+            <button type="submit">S'inscrire et recevoir 2 000 AR</button>
+        </form>
     </div>
 
-    <!-- SDK Firebase (Version modulaire compatible web moderne) -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getFirestore, doc, getDoc, setDoc, updateDoc, increment } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-
-        // 1. Remplacez ces informations par les vôtres obtenues sur la console Firebase
-        const firebaseConfig = {
-            apiKey: "VOTRE_API_KEY",
-            authDomain: "votre-projet.firebaseapp.com",
-            projectId: "votre-projet",
-            storageBucket: "votre-projet.appspot.com",
-            messagingSenderId: "ID_SENDER",
-            appId: "VOTRE_APP_ID"
-        };
-
-        // Initialisation de Firebase
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
-
-        // ID de test pour l'utilisateur
-        const userId = "utilisateur_test_123";
-        const userRef = doc(db, "utilisateurs", userId);
-
-        async function chargerProfil() {
-            document.getElementById("user-email").innerText = userId;
-            const docSnap = await getDoc(userRef);
+    <script>
+        document.getElementById('inscriptionForm').addEventListener('submit', function(e) {
+            e.preventDefault(); // Empêche la réinitialisation de la page
             
-            if (docSnap.exists()) {
-                document.getElementById("user-balance").innerText = docSnap.data().solde || 0;
-            } else {
-                await setDoc(userRef, { solde: 0 });
-                document.getElementById("user-balance").innerText = 0;
-            }
-        }
-
-        window.accomplirTache = async function() {
-            try {
-                await updateDoc(userRef, {
-                    solde: increment(500)
-                });
-                alert("Tâche validée ! +500 Ar ajoutés.");
-                chargerProfil();
-            } catch (error) {
-                console.error("Erreur lors de la tâche : ", error);
-            }
-        };
-
-        window.simulerRetrait = async function() {
-            const docSnap = await getDoc(userRef);
-            const soldeActuel = docSnap.data().solde || 0;
+            const password = document.getElementById('password').value;
+            const hasLetters = /[a-zA-Z]/.test(password);
+            const hasNumbers = /[0-9]/.test(password);
             
-            if (soldeActuel >= 5000) {
-                alert("Demande de retrait Mobile Money envoyée avec succès !");
-            } else {
-                alert("Solde insuffisant. Il vous faut au moins 5000 Ar pour effectuer un retrait.");
+            if (password.length < 6) {
+                alert("Le mot de passe doit contenir au moins 6 caractères.");
+                return;
             }
-        };
-
-        chargerProfil();
+            
+            if (!hasLetters || !hasNumbers) {
+                alert("Le mot de passe doit contenir à la fois des lettres et des chiffres.");
+                return;
+            }
+            
+            // Redirection vers la page du tableau de bord si tout est correct
+            window.location.href = "dashboard.html";
+        });
     </script>
+</body>
+</html>
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bossman - Tableau de bord</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: sans-serif; }
+        body { background-color: #0f172a; color: #ffffff; display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; }
+        .container { background-color: #1e293b; padding: 30px; border-radius: 16px; width: 100%; max-width: 400px; text-align: center; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5); }
+        h1 { color: #22c55e; margin-bottom: 15px; font-size: 26px; }
+        p { color: #cbd5e1; margin-bottom: 25px; font-size: 16px; }
+        .balance { background-color: #0f172a; padding: 20px; border-radius: 10px; font-size: 22px; color: #eab308; font-weight: bold; margin-bottom: 25px; border: 1px solid #334155; }
+        a { display: inline-block; padding: 12px 20px; background-color: #334155; color: #ffffff; text-decoration: none; border-radius: 8px; font-weight: bold; }
+        a:hover { background-color: #475569; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>BIENVENUE</h1>
+        <p>Votre compte a été créé avec succès !</p>
+        
+        <div class="balance">
+            Solde : 2 000 AR
+        </div>
+        
+        <a href="index.html">Déconnexion</a>
+    </div>
+
 </body>
 </html>
