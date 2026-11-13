@@ -103,5 +103,154 @@
         let items = [];
         let spawnTimer = 0;
 
-        // Commandes Cl
-        
+        // Commandes Clavier
+        const keys = {};
+        window.addEventListener("keydown", (e) => keys[e.code] = true);
+        window.addEventListener("keyup", (e) => keys[e.code] = false);
+
+        // Commandes Tactiles / Boutons
+        const leftBtn = document.getElementById("leftBtn");
+        const rightBtn = document.getElementById("rightBtn");
+
+        leftBtn.addEventListener("touchstart", () => player.dx = -player.speed);
+        leftBtn.addEventListener("touchend", () => player.dx = 0);
+        rightBtn.addEventListener("touchstart", () => player.dx = player.speed);
+        rightBtn.addEventListener("touchend", () => player.dx = 0);
+
+        leftBtn.addEventListener("mousedown", () => player.dx = -player.speed);
+        leftBtn.addEventListener("mouseup", () => player.dx = 0);
+        rightBtn.addEventListener("mousedown", () => player.dx = player.speed);
+        rightBtn.addEventListener("mouseup", () => player.dx = 0);
+
+        function spawnItem() {
+            const types = ['good', 'good', 'bad']; // Plus de chances d'avoir des bons items
+            const type = types[Math.floor(Math.random() * types.length)];
+            items.push({
+                x: Math.random() * (canvas.width - 30),
+                y: -30,
+                size: 25,
+                speed: 3 + Math.random() * 3,
+                type: type
+            });
+        }
+
+        function update() {
+            if (isGameOver) return;
+
+            // Gestion Mouvement Clavier PC
+            if (keys["ArrowLeft"] || keys["KeyA"]) {
+                player.x -= player.speed;
+            } else if (keys["ArrowRight"] || keys["KeyD"]) {
+                player.x += player.speed;
+            } else {
+                player.x += player.dx;
+            }
+
+            // Limites du canvas
+            if (player.x < 0) player.x = 0;
+            if (player.x + player.width > canvas.width) player.x = canvas.width - player.width;
+
+            // Apparition d'objets
+            spawnTimer++;
+            if (spawnTimer > 40) {
+                spawnItem();
+                spawnTimer = 0;
+            }
+
+            // Mise à jour des items
+            for (let i = items.length - 1; i >= 0; i--) {
+                items[i].y += items[i].speed;
+
+                // Collision avec le joueur
+                if (
+                    items[i].x < player.x + player.width &&
+                    items[i].x + items[i].size > player.x &&
+                    items[i].y < player.y + player.height &&
+                    items[i].y + items[i].size > player.y
+                ) {
+                    if (items[i].type === 'good') {
+                        score += 10;
+                    } else {
+                        lives--;
+                        if (lives <= 0) {
+                            isGameOver = true;
+                        }
+                    }
+                    items.splice(i, 1);
+                    continue;
+                }
+
+                // Supprimer si l'item sort de l'écran
+                if (items[i].y > canvas.height) {
+                    if (items[i].type === 'good') {
+                        lives--; // Perdre une vie si on rate un bon item
+                        if (lives <= 0) isGameOver = true;
+                    }
+                    items.splice(i, 1);
+                }
+            }
+        }
+
+        function draw() {
+            // Effacer l'écran
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Dessiner le joueur
+            ctx.fillStyle = "#58a6ff";
+            ctx.shadowBlur = 15;
+            ctx.shadowColor = "#58a6ff";
+            ctx.fillRect(player.x, player.y, player.width, player.height);
+            ctx.shadowBlur = 0; // Reset ombre
+
+            // Dessiner les items
+            items.forEach(item => {
+                ctx.fillStyle = item.type === 'good' ? "#2ea043" : "#f85149";
+                ctx.beginPath();
+                ctx.arc(item.x + item.size / 2, item.y + item.size / 2, item.size / 2, 0, Math.PI * 2);
+                ctx.fill();
+            });
+
+            // Afficher Score et Vies
+            ctx.fillStyle = "#c9d1d9";
+            ctx.font = "16px sans-serif";
+            ctx.fillText(`Score: ${score}`, 20, 30);
+            ctx.fillText(`Vies: ${'❤️'.repeat(lives)}`, canvas.width - 110, 30);
+
+            // Écran de Game Over
+            if (isGameOver) {
+                ctx.fillStyle = "rgba(13, 17, 23, 0.85)";
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+                ctx.fillStyle = "#f85149";
+                ctx.font = "bold 28px sans-serif";
+                ctx.textAlign = "center";
+                ctx.fillText("GAME OVER", canvas.width / 2, canvas.height / 2 - 20);
+
+                ctx.fillStyle = "#c9d1d9";
+                ctx.font = "16px sans-serif";
+                ctx.fillText(`Score final : ${score}`, canvas.width / 2, canvas.height / 2 + 20);
+                ctx.fillText("Cliquez pour rejouer", canvas.width / 2, canvas.height / 2 + 60);
+                ctx.textAlign = "left";
+            }
+        }
+
+        function loop() {
+            update();
+            draw();
+            requestAnimationFrame(loop);
+        }
+
+        // Relancer la partie au clic en cas de Game Over
+        canvas.addEventListener("click", () => {
+            if (isGameOver) {
+                score = 0;
+                lives = 3;
+                items = [];
+                isGameOver = false;
+            }
+        });
+
+        loop();
+    </script>
+</body>
+</html>
