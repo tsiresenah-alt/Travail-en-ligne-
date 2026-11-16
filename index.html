@@ -3,10 +3,53 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ludo Gasy Arena</title>
+    <title>Ludo Gasy - Arena</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
         body { background-color: #0f172a; color: #f8fafc; padding-bottom: 70px; }
+
+        /* --- ÉCRAN DE CHARGEMENT (SPLASH SCREEN) --- */
+        #splash-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #0f172a;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            transition: opacity 0.5s ease;
+        }
+        .splash-logo {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #38bdf8;
+            margin-bottom: 10px;
+            text-shadow: 0 0 15px rgba(56, 189, 248, 0.5);
+            animation: pulse 1.5s infinite;
+        }
+        .splash-sub {
+            font-size: 1.1rem;
+            color: #facc15;
+            letter-spacing: 2px;
+            margin-bottom: 30px;
+            text-transform: uppercase;
+        }
+        .spinner {
+            width: 45px;
+            height: 45px;
+            border: 4px solid #334155;
+            border-top: 4px solid #38bdf8;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
+
+        /* --- DESIGN GÉNÉRAL --- */
         header { background: #1e293b; padding: 15px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #334155; }
         .logo { font-size: 1.2rem; font-weight: bold; color: #38bdf8; }
         .balance-badge { background: #0284c7; padding: 5px 12px; border-radius: 20px; font-size: 0.9rem; font-weight: bold; }
@@ -32,7 +75,7 @@
         
         .operator-box { background: #334155; padding: 10px; border-radius: 6px; margin-bottom: 8px; font-size: 0.9rem; }
 
-        /* --- STYLE DU PLATEAU DE LUDO FIDÈLE À L'IMAGE --- */
+        /* --- PLATEAU DE LUDO STRUCTURÉ --- */
         .ludo-game-wrapper {
             background: #1e293b;
             border: 2px solid #475569;
@@ -41,20 +84,13 @@
             margin: 15px 0;
         }
 
-        /* En-têtes joueurs du haut (Computer 1 & Computer 2) */
-        .board-header-row {
+        .board-header-row, .board-footer-row {
             display: flex;
             justify-content: space-between;
-            margin-bottom: 8px;
             gap: 5px;
         }
-        /* En-têtes joueurs du bas (You & Computer 3) */
-        .board-footer-row {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 8px;
-            gap: 5px;
-        }
+        .board-header-row { margin-bottom: 8px; }
+        .board-footer-row { margin-top: 8px; }
 
         .player-hud {
             background: #0f172a;
@@ -67,7 +103,7 @@
             flex: 1;
             font-size: 0.75rem;
         }
-        .player-hud img, .player-hud .avatar-placeholder {
+        .player-hud .avatar-placeholder {
             width: 28px;
             height: 28px;
             border-radius: 50%;
@@ -77,14 +113,10 @@
             justify-content: center;
             font-size: 0.9rem;
         }
-        .hud-info {
-            display: flex;
-            flex-direction: column;
-        }
+        .hud-info { display: flex; flex-direction: column; }
         .hud-name { font-weight: bold; color: #f8fafc; font-size: 0.7rem; }
         .hud-dice { color: #facc15; font-size: 0.75rem; font-weight: bold; }
 
-        /* Le plateau central en croix */
         .ludo-board {
             width: 100%;
             max-width: 320px;
@@ -134,16 +166,19 @@
             text-align: center;
             padding: 2px;
         }
-
-        .path-section {
-            background: #1e293b;
-            border: 1px solid #334155;
-            display: grid;
-        }
+        .path-section { background: #1e293b; border: 1px solid #334155; }
     </style>
 </head>
 <body>
 
+    <!-- ÉCRAN DE CHARGEMENT INITIAL -->
+    <div id="splash-screen">
+        <div class="splash-logo">🎲 LUDO GASY</div>
+        <div class="splash-sub">Chargement du jeu...</div>
+        <div class="spinner"></div>
+    </div>
+
+    <!-- HEADER PRINCIPAL -->
     <header>
         <div class="logo">🎲 Ludo Gasy Arena</div>
         <div class="balance-badge" id="user-balance">0 Ar</div>
@@ -157,10 +192,10 @@
                 <h2>Table Ludo Classique (4 Joueurs)</h2>
                 <p>Mise : <strong>2 000 Ar</strong> | Gain : <strong style="color: #4ade80;">6 000 Ar</strong></p>
                 
-                <!-- PLATEAU DE LUDO STRUCTURÉ COMME SUR L'IMAGE -->
+                <!-- PLATEAU DE LUDO -->
                 <div class="ludo-game-wrapper">
                     
-                    <!-- Ligne haute : Computer 1 & Computer 2[span_5](start_span)[span_5](end_span) -->
+                    <!-- Ligne haute : Computer 1 & Computer 2[span_0](start_span)[span_0](end_span) -->
                     <div class="board-header-row">
                         <div class="player-hud" style="border-color: #ef4444;">
                             <div class="avatar-placeholder">🤖</div>
@@ -178,46 +213,37 @@
                         </div>
                     </div>
 
-                    <!-- Le Plateau 3x3 -->
+                    <!-- Plateau Central -->
                     <div class="ludo-board">
-                        <!-- Base Rouge (Computer 1) -->
                         <div class="ludo-base base-red">
                             <div class="pawn-spot">🔴</div><div class="pawn-spot">🔴</div>
                             <div class="pawn-spot">🔴</div><div class="pawn-spot">🔴</div>
                         </div>
-                        <!-- Chemin haut -->
                         <div class="path-section" style="background:#14532d;"></div>
-                        <!-- Base Verte (Computer 2) -->
                         <div class="ludo-base base-green">
                             <div class="pawn-spot">🟢</div><div class="pawn-spot">🟢</div>
                             <div class="pawn-spot">🟢</div><div class="pawn-spot">🟢</div>
                         </div>
                         
-                        <!-- Chemin gauche -->
                         <div class="path-section" style="background:#7f1d1d;"></div>
-                        <!-- Centre -->
                         <div class="ludo-center">
                             <span>🏠</span>
                             <span id="center-status" style="font-size:0.65rem; color:#facc15;">Prêt</span>
                         </div>
-                        <!-- Chemin droite -->
                         <div class="path-section" style="background:#713f12;"></div>
 
-                        <!-- Base Bleue (You) -->
                         <div class="ludo-base base-blue">
                             <div class="pawn-spot">🔵</div><div class="pawn-spot">🔵</div>
                             <div class="pawn-spot">🔵</div><div class="pawn-spot">🔵</div>
                         </div>
-                        <!-- Chemin bas -->
                         <div class="path-section" style="background:#1e3a8a;"></div>
-                        <!-- Base Jaune (Computer 3) -->
                         <div class="ludo-base base-yellow">
                             <div class="pawn-spot">🟡</div><div class="pawn-spot">🟡</div>
                             <div class="pawn-spot">🟡</div><div class="pawn-spot">🟡</div>
                         </div>
                     </div>
 
-                    <!-- Ligne basse : You & Computer 3[span_6](start_span)[span_6](end_span) -->
+                    <!-- Ligne basse : You & Computer 3[span_1](start_span)[span_1](end_span) -->
                     <div class="board-footer-row">
                         <div class="player-hud" style="border-color: #3b82f6;">
                             <div class="avatar-placeholder">👤</div>
@@ -297,6 +323,17 @@
     </nav>
 
     <script>
+        // Disparition automatique de l'écran de chargement après 2 secondes
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                let splash = document.getElementById('splash-screen');
+                splash.style.opacity = '0';
+                setTimeout(() => {
+                    splash.style.display = 'none';
+                }, 500);
+            }, 2000);
+        });
+
         let userSolde = 4000; // Solde initial de test
 
         function updateUI() {
@@ -350,7 +387,7 @@
                 statusBox.innerHTML += "<br>🟢 <b>Computer 2</b> et 🟡 <b>Computer 3</b> jouent leur tour.";
             }, 3800);
 
-            // Résultat final (protection admin : 75% de chance que les bots gagnent pour épargner ton budget)
+            // Résultat final (protection admin : 75% de chance que les bots gagnent)
             setTimeout(() => {
                 let securiteAdminChance = 0.75; 
                 let tirageAleatoire = Math.random();
