@@ -3,53 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ludo Gasy - Arena</title>
+    <title>Ludo Gasy Arena</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
         body { background-color: #0f172a; color: #f8fafc; padding-bottom: 70px; }
 
-        /* --- ÉCRAN DE CHARGEMENT (SPLASH SCREEN) --- */
+        /* --- ÉCRAN DE CHARGEMENT --- */
         #splash-screen {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: #0f172a;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            z-index: 9999;
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: #0f172a; display: flex; flex-direction: column;
+            justify-content: center; align-items: center; z-index: 9999;
             transition: opacity 0.5s ease;
         }
-        .splash-logo {
-            font-size: 2.5rem;
-            font-weight: bold;
-            color: #38bdf8;
-            margin-bottom: 10px;
-            text-shadow: 0 0 15px rgba(56, 189, 248, 0.5);
-            animation: pulse 1.5s infinite;
-        }
-        .splash-sub {
-            font-size: 1.1rem;
-            color: #facc15;
-            letter-spacing: 2px;
-            margin-bottom: 30px;
-            text-transform: uppercase;
-        }
-        .spinner {
-            width: 45px;
-            height: 45px;
-            border: 4px solid #334155;
-            border-top: 4px solid #38bdf8;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
+        .splash-logo { font-size: 2.5rem; font-weight: bold; color: #38bdf8; margin-bottom: 10px; text-shadow: 0 0 15px rgba(56, 189, 248, 0.5); }
+        .splash-sub { font-size: 1.1rem; color: #facc15; letter-spacing: 2px; margin-bottom: 30px; text-transform: uppercase; }
+        .spinner { width: 45px; height: 45px; border: 4px solid #334155; border-top: 4px solid #38bdf8; border-radius: 50%; animation: spin 1s linear infinite; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
 
-        /* --- DESIGN GÉNÉRAL --- */
         header { background: #1e293b; padding: 15px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #334155; }
         .logo { font-size: 1.2rem; font-weight: bold; color: #38bdf8; }
         .balance-badge { background: #0284c7; padding: 5px 12px; border-radius: 20px; font-size: 0.9rem; font-weight: bold; }
@@ -67,7 +37,7 @@
         
         /* Navigation basse */
         nav { position: fixed; bottom: 0; left: 0; width: 100%; background: #1e293b; display: flex; justify-content: space-around; padding: 10px 0; border-top: 1px solid #334155; z-index: 100; }
-        nav button { background: none; border: none; color: #94a3b8; font-size: 0.8rem; cursor: pointer; display: flex; flex-direction: column; align-items: center; }
+        nav button { background: none; border: none; color: #94a3b8; font-size: 0.75rem; cursor: pointer; display: flex; flex-direction: column; align-items: center; }
         nav button.active { color: #38bdf8; }
 
         .tab-content { display: none; }
@@ -75,110 +45,66 @@
         
         .operator-box { background: #334155; padding: 10px; border-radius: 6px; margin-bottom: 8px; font-size: 0.9rem; }
 
-        /* --- PLATEAU DE LUDO STRUCTURÉ --- */
+        /* --- PLATEAU DE LUDO AVEC PETITES CASES --- */
         .ludo-game-wrapper {
-            background: #1e293b;
-            border: 2px solid #475569;
-            border-radius: 12px;
-            padding: 10px;
-            margin: 15px 0;
+            background: #1e293b; border: 2px solid #475569; border-radius: 12px; padding: 10px; margin: 15px 0;
         }
-
-        .board-header-row, .board-footer-row {
-            display: flex;
-            justify-content: space-between;
-            gap: 5px;
-        }
+        .board-header-row, .board-footer-row { display: flex; justify-content: space-between; gap: 5px; }
         .board-header-row { margin-bottom: 8px; }
         .board-footer-row { margin-top: 8px; }
 
         .player-hud {
-            background: #0f172a;
-            border: 1px solid #475569;
-            border-radius: 8px;
-            padding: 6px;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            flex: 1;
-            font-size: 0.75rem;
+            background: #0f172a; border: 1px solid #475569; border-radius: 8px; padding: 6px; display: flex; align-items: center; gap: 6px; flex: 1; font-size: 0.75rem;
         }
-        .player-hud .avatar-placeholder {
-            width: 28px;
-            height: 28px;
-            border-radius: 50%;
-            background: #334155;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.9rem;
-        }
+        .avatar-placeholder { width: 28px; height: 28px; border-radius: 50%; background: #334155; display: flex; align-items: center; justify-content: center; font-size: 0.9rem; }
         .hud-info { display: flex; flex-direction: column; }
         .hud-name { font-weight: bold; color: #f8fafc; font-size: 0.7rem; }
         .hud-dice { color: #facc15; font-size: 0.75rem; font-weight: bold; }
 
+        /* Grille principale du plateau */
         .ludo-board {
-            width: 100%;
-            max-width: 320px;
-            height: 320px;
-            margin: 0 auto;
-            background: #0f172a;
-            border: 3px solid #334155;
-            border-radius: 6px;
-            display: grid;
-            grid-template-columns: 2fr 1.2fr 2fr;
-            grid-template-rows: 2fr 1.2fr 2fr;
-            position: relative;
+            width: 100%; max-width: 320px; height: 320px; margin: 0 auto; background: #0f172a; border: 3px solid #334155; border-radius: 6px;
+            display: grid; grid-template-columns: 2fr 1.2fr 2fr; grid-template-rows: 2fr 1.2fr 2fr; position: relative;
         }
+        .ludo-base { display: grid; grid-template-columns: repeat(2, 1fr); grid-template-rows: repeat(2, 1fr); padding: 12px; gap: 8px; }
+        .base-red { background: #ef4444; border-top-left-radius: 4px; }
+        .base-green { background: #22c55e; border-top-right-radius: 4px; }
+        .base-blue { background: #3b82f6; border-bottom-left-radius: 4px; }
+        .base-yellow { background: #eab308; border-bottom-right-radius: 4px; }
 
-        .ludo-base {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            grid-template-rows: repeat(2, 1fr);
-            padding: 12px;
-            gap: 8px;
-        }
-        .base-red { background: #ef4444; border-top-left-radius: 4px; }    /* Computer 1 */
-        .base-green { background: #22c55e; border-top-right-radius: 4px; } /* Computer 2 */
-        .base-blue { background: #3b82f6; border-bottom-left-radius: 4px; }  /* You */
-        .base-yellow { background: #eab308; border-bottom-right-radius: 4px; }/* Computer 3 */
-
-        .pawn-spot {
-            background: rgba(255, 255, 255, 0.9);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.75rem;
-            box-shadow: inset 0 2px 4px rgba(0,0,0,0.3);
-        }
+        .pawn-spot { background: rgba(255, 255, 255, 0.9); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.7rem; }
 
         .ludo-center {
-            background: #1e293b;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            border: 2px dashed #475569;
-            font-size: 0.75rem;
-            font-weight: bold;
-            color: #38bdf8;
-            text-align: center;
-            padding: 2px;
+            background: #1e293b; display: flex; flex-direction: column; justify-content: center; align-items: center; border: 2px dashed #475569; font-size: 0.75rem; font-weight: bold; color: #38bdf8; text-align: center;
         }
-        .path-section { background: #1e293b; border: 1px solid #334155; }
+
+        /* Chemins avec des petites cases visibles */
+        .path-section {
+            background: #1e293b; display: grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(3, 1fr); gap: 1px; padding: 2px;
+        }
+        .mini-case {
+            background: #334155; border-radius: 2px; font-size: 0.5rem; display: flex; align-items: center; justify-content: center; color: #94a3b8;
+        }
+        .mini-case.safe { background: #eab308; } /* Étoile / Refuge */
+        .mini-case.path-red { background: #ef4444; }
+        .mini-case.path-green { background: #22c55e; }
+        .mini-case.path-blue { background: #3b82f6; }
+        .mini-case.path-yellow { background: #eab308; }
+
+        .rules-list { font-size: 0.9rem; line-height: 1.6; color: #cbd5e1; }
+        .rules-list li { margin-bottom: 10px; }
     </style>
 </head>
 <body>
 
-    <!-- ÉCRAN DE CHARGEMENT INITIAL -->
+    <!-- ÉCRAN DE CHARGEMENT -->
     <div id="splash-screen">
         <div class="splash-logo">🎲 LUDO GASY</div>
-        <div class="splash-sub">Chargement du jeu...</div>
+        <div class="splash-sub">Chargement du plateau...</div>
         <div class="spinner"></div>
     </div>
 
-    <!-- HEADER PRINCIPAL -->
+    <!-- HEADER -->
     <header>
         <div class="logo">🎲 Ludo Gasy Arena</div>
         <div class="balance-badge" id="user-balance">0 Ar</div>
@@ -192,10 +118,10 @@
                 <h2>Table Ludo Classique (4 Joueurs)</h2>
                 <p>Mise : <strong>2 000 Ar</strong> | Gain : <strong style="color: #4ade80;">6 000 Ar</strong></p>
                 
-                <!-- PLATEAU DE LUDO -->
+                <!-- PLATEAU DE LUDO AVEC PETITES CASES DE PARCOURS -->
                 <div class="ludo-game-wrapper">
                     
-                    <!-- Ligne haute : Computer 1 & Computer 2[span_0](start_span)[span_0](end_span) -->
+                    <!-- Computer 1 & 2 -->
                     <div class="board-header-row">
                         <div class="player-hud" style="border-color: #ef4444;">
                             <div class="avatar-placeholder">🤖</div>
@@ -213,37 +139,68 @@
                         </div>
                     </div>
 
-                    <!-- Plateau Central -->
+                    <!-- Plateau 3x3 avec pistes de petites cases -->
                     <div class="ludo-board">
+                        <!-- Base Rouge -->
                         <div class="ludo-base base-red">
                             <div class="pawn-spot">🔴</div><div class="pawn-spot">🔴</div>
                             <div class="pawn-spot">🔴</div><div class="pawn-spot">🔴</div>
                         </div>
-                        <div class="path-section" style="background:#14532d;"></div>
+                        
+                        <!-- Piste Haute (Petites cases vertes/blanches) -->
+                        <div class="path-section">
+                            <div class="mini-case"></div><div class="mini-case path-green"></div><div class="mini-case"></div>
+                            <div class="mini-case safe">⭐</div><div class="mini-case path-green"></div><div class="mini-case"></div>
+                            <div class="mini-case"></div><div class="mini-case path-green"></div><div class="mini-case"></div>
+                        </div>
+
+                        <!-- Base Verte -->
                         <div class="ludo-base base-green">
                             <div class="pawn-spot">🟢</div><div class="pawn-spot">🟢</div>
                             <div class="pawn-spot">🟢</div><div class="pawn-spot">🟢</div>
                         </div>
                         
-                        <div class="path-section" style="background:#7f1d1d;"></div>
+                        <!-- Piste Gauche (Petites cases rouges) -->
+                        <div class="path-section">
+                            <div class="mini-case"></div><div class="mini-case safe">⭐</div><div class="mini-case"></div>
+                            <div class="mini-case path-red"></div><div class="mini-case path-red"></div><div class="mini-case path-red"></div>
+                            <div class="mini-case"></div><div class="mini-case"></div><div class="mini-case"></div>
+                        </div>
+
+                        <!-- Centre d'arrivée -->
                         <div class="ludo-center">
                             <span>🏠</span>
                             <span id="center-status" style="font-size:0.65rem; color:#facc15;">Prêt</span>
                         </div>
-                        <div class="path-section" style="background:#713f12;"></div>
 
+                        <!-- Piste Droite (Petites cases jaunes) -->
+                        <div class="path-section">
+                            <div class="mini-case"></div><div class="mini-case"></div><div class="mini-case"></div>
+                            <div class="mini-case path-yellow"></div><div class="mini-case path-yellow"></div><div class="mini-case path-yellow"></div>
+                            <div class="mini-case"></div><div class="mini-case safe">⭐</div><div class="mini-case"></div>
+                        </div>
+
+                        <!-- Base Bleue (Vous) -->
                         <div class="ludo-base base-blue">
                             <div class="pawn-spot">🔵</div><div class="pawn-spot">🔵</div>
                             <div class="pawn-spot">🔵</div><div class="pawn-spot">🔵</div>
                         </div>
-                        <div class="path-section" style="background:#1e3a8a;"></div>
+
+                        <!-- Piste Basse (Petites cases bleues) -->
+                        <div class="path-section">
+                            <div class="mini-case"></div><div class="mini-case path-blue"></div><div class="mini-case"></div>
+                            <div class="mini-case"></div><div class="mini-case path-blue"></div><div class="mini-case safe">⭐</div>
+                            <div class="mini-case"></div><div class="mini-case path-blue"></div><div class="mini-case"></div>
+                        </div>
+
+                        <!-- Base Jaune -->
                         <div class="ludo-base base-yellow">
                             <div class="pawn-spot">🟡</div><div class="pawn-spot">🟡</div>
                             <div class="pawn-spot">🟡</div><div class="pawn-spot">🟡</div>
                         </div>
                     </div>
 
-                    <!-- Ligne basse : You & Computer 3[span_1](start_span)[span_1](end_span) -->
+                    <!-- Vous & Computer 3 -->
                     <div class="board-footer-row">
                         <div class="player-hud" style="border-color: #3b82f6;">
                             <div class="avatar-placeholder">👤</div>
@@ -272,27 +229,35 @@
             </div>
         </div>
 
+        <!-- SECTION RÈGLES DU JEU -->
+        <div id="tab-rules" class="tab-content">
+            <div class="card">
+                <h2>📜 Règlements du Ludo Gasy</h2>
+                <ul class="rules-list">
+                    <li>🎲 <b>Sortie de base :</b> Vous devez obtenir un <b>6</b> pour sortir un pion de votre base bleue et le placer sur les petites cases de la piste.</li>
+                    <li>♟️ <b>Déplacement :</b> Les pions avancent case par case selon le score du dé lancé à chaque tour.</li>
+                    <li>⚔️ <b>Capture :</b> Si votre pion arrive sur une case occupée par un pion adverse (Computer 1, 2 ou 3), ce dernier est capturé et renvoyé dans sa base.</li>
+                    <li>⭐ <b>Cases Sécurisées :</b> Les cases marquées d'une étoile (⭐) protègent vos pions contre les captures.</li>
+                    <li>🏆 <b>Objectif et Victoire :</b> Le premier joueur qui parvient à faire traverser le circuit à ses 4 pions et à les amener dans la maison centrale remporte la cagnotte de <b>6 000 Ar</b> !</li>
+                </ul>
+            </div>
+        </div>
+
         <!-- SECTION DEPOT -->
         <div id="tab-deposit" class="tab-content">
             <div class="card">
                 <h2>Faire un Dépôt</h2>
                 <p style="font-size: 0.9rem; margin-bottom: 10px;">Transférez d'abord l'argent sur nos numéros :</p>
-                
                 <div class="operator-box"><strong>MVola :</strong> 034 00 000 00 (Nom: Hasam)</div>
                 <div class="operator-box"><strong>Orange Money :</strong> 032 00 000 00 (Nom: Hasam)</div>
                 <div class="operator-box"><strong>Airtel Money :</strong> 033 00 000 00 (Nom: Hasam)</div>
-
                 <hr style="border: 0; border-top: 1px solid #334155; margin: 15px 0;">
-
                 <label>Montant envoyé (Ex: 2000 Ar)</label>
                 <input type="number" id="deposit-amount" placeholder="2000">
-
                 <label>Votre Numéro de téléphone</label>
                 <input type="text" id="deposit-phone" placeholder="034XX XXX XX">
-
                 <label>Référence / ID du SMS de transfert</label>
                 <input type="text" id="deposit-ref" placeholder="Ex: TX12345678">
-
                 <button class="btn" onclick="soumettreDepot()">Valider la demande de dépôt</button>
             </div>
         </div>
@@ -302,13 +267,10 @@
             <div class="card">
                 <h2>Demande de Retrait</h2>
                 <p style="font-size: 0.9rem; color: #94a3b8; margin-bottom: 10px;">Seuil minimum requis : <strong style="color: white;">10 000 Ar</strong></p>
-                
                 <label>Montant à retirer (Ar)</label>
                 <input type="number" id="withdraw-amount" placeholder="10000">
-
                 <label>Votre Numéro Mobile Money</label>
                 <input type="text" id="withdraw-phone" placeholder="03X XX XXX XX">
-
                 <button class="btn" onclick="demanderRetrait()">Demander le Retrait</button>
             </div>
         </div>
@@ -318,23 +280,22 @@
     <!-- NAVIGATION BASSE -->
     <nav>
         <button class="active" onclick="switchTab('game', this)"><span>🎮</span> Jeu</button>
+        <button onclick="switchTab('rules', this)"><span>📜</span> Règles</button>
         <button onclick="switchTab('deposit', this)"><span>💳</span> Dépôt</button>
         <button onclick="switchTab('withdraw', this)"><span>💸</span> Retrait</button>
     </nav>
 
     <script>
-        // Disparition automatique de l'écran de chargement après 2 secondes
+        // Disparition de l'écran de chargement
         window.addEventListener('load', () => {
             setTimeout(() => {
                 let splash = document.getElementById('splash-screen');
                 splash.style.opacity = '0';
-                setTimeout(() => {
-                    splash.style.display = 'none';
-                }, 500);
+                setTimeout(() => { splash.style.display = 'none'; }, 500);
             }, 2000);
         });
 
-        let userSolde = 4000; // Solde initial de test
+        let userSolde = 4000;
 
         function updateUI() {
             document.getElementById('user-balance').innerText = userSolde.toLocaleString() + ' Ar';
@@ -344,7 +305,6 @@
         function switchTab(tabId, btnElement) {
             document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
             document.querySelectorAll('nav button').forEach(el => el.classList.remove('active'));
-            
             document.getElementById('tab-' + tabId).classList.add('active');
             btnElement.classList.add('active');
         }
@@ -352,11 +312,10 @@
         function rejoindreTable() {
             if (userSolde < 2000) {
                 alert("Solde insuffisant ! Veuillez faire un dépôt de 2 000 Ar.");
-                switchTab('deposit', document.querySelectorAll('nav button')[1]);
+                switchTab('deposit', document.querySelectorAll('nav button')[2]);
                 return;
             }
 
-            // Déduction de la mise
             userSolde -= 2000;
             updateUI();
 
@@ -367,72 +326,30 @@
             
             btn.style.display = 'none';
             statusCard.style.display = 'block';
-            statusBox.innerHTML = "🔍 Recherche de joueurs... Remplacement par Computer 1, 2 et 3.";
+            statusBox.innerHTML = "🔍 Lancement de la partie contre Computer 1, 2 et 3...";
             centerStatus.innerText = "En cours";
 
-            // Séquence animée du jeu
             setTimeout(() => {
                 document.getElementById('dice-c1').innerText = "🎲 [ 6 ]";
-                statusBox.innerHTML += "<br>🔴 <b>Computer 1</b> lance 6 et sort un pion.";
+                statusBox.innerHTML += "<br>🔴 <b>Computer 1</b> fait 6 et sort de sa base.";
             }, 1200);
 
             setTimeout(() => {
                 document.getElementById('dice-you').innerText = "🎲 [ 4 ]";
-                statusBox.innerHTML += "<br>🔵 <b>Vous</b> lancez 4 et avancez vos pions bleus.";
+                statusBox.innerHTML += "<br>🔵 <b>Vous</b> lancez 4 et avancez sur les petites cases bleues.";
             }, 2500);
 
             setTimeout(() => {
                 document.getElementById('dice-c2').innerText = "🎲 [ 5 ]";
                 document.getElementById('dice-c3').innerText = "🎲 [ 2 ]";
-                statusBox.innerHTML += "<br>🟢 <b>Computer 2</b> et 🟡 <b>Computer 3</b> jouent leur tour.";
+                statusBox.innerHTML += "<br>🟢 et 🟡 avancent sur le circuit.";
             }, 3800);
 
-            // Résultat final (protection admin : 75% de chance que les bots gagnent)
             setTimeout(() => {
                 let securiteAdminChance = 0.75; 
-                let tirageAleatoire = Math.random();
-
-                if (tirageAleatoire < securiteAdminChance) {
+                if (Math.random() < securiteAdminChance) {
                     centerStatus.innerText = "Perdu";
-                    statusBox.innerHTML += "<br><br>❌ <b>Fin de partie :</b> <b>Computer 1</b> a rentré ses 4 pions en premier. Vous avez perdu votre mise de 2 000 Ar.";
+                    statusBox.innerHTML += "<br><br>❌ <b>Partie perdue :</b> Computer 1 a rentré ses pions en premier. Mise de 2 000 Ar perdue.";
                 } else {
                     userSolde += 6000;
-                    updateUI();
-                    centerStatus.innerText = "Victoire !";
-                    statusBox.innerHTML += "<br><br>🎉 <b>Victoire magistrale !</b> Vous avez battu les ordinateurs ! <span style='color:#4ade80;'>+6 000 Ar</span> ajoutés à votre solde.";
-                }
-
-                btn.style.display = 'block';
-                btn.innerText = "Rejouer (2 000 Ar)";
-            }, 5500);
-        }
-
-        function soumettreDepot() {
-            let montant = document.getElementById('deposit-amount').value;
-            let ref = document.getElementById('deposit-ref').value;
-            if(!montant || !ref) {
-                alert("Veuillez remplir tous les champs du dépôt.");
-                return;
-            }
-            alert("Demande de dépôt envoyée ! L'administrateur va valider.");
-            userSolde += Number(montant);
-            updateUI();
-        }
-
-        function demanderRetrait() {
-            let montant = Number(document.getElementById('withdraw-amount').value);
-            if (montant < 10000) {
-                alert("Le montant minimum de retrait est de 10 000 Ar.");
-                return;
-            }
-            if (montant > userSolde) {
-                alert("Vous n'avez pas assez de solde.");
-                return;
-            }
-            userSolde -= montant;
-            updateUI();
-            alert("Demande de retrait enregistrée avec succès !");
-        }
-    </script>
-</body>
-</html>
+      
