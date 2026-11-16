@@ -23,7 +23,7 @@
         input, select { width: 100%; padding: 10px; margin: 8px 0; background: #0f172a; border: 1px solid #475569; border-radius: 6px; color: white; font-size: 1rem; }
         
         /* Navigation basse */
-        nav { position: fixed; bottom: 0; left: 0; width: 100%; background: #1e293b; display: flex; justify-content: space-around; padding: 10px 0; border-top: 1px solid #334155; }
+        nav { position: fixed; bottom: 0; left: 0; width: 100%; background: #1e293b; display: flex; justify-content: space-around; padding: 10px 0; border-top: 1px solid #334155; z-index: 100; }
         nav button { background: none; border: none; color: #94a3b8; font-size: 0.8rem; cursor: pointer; display: flex; flex-direction: column; align-items: center; }
         nav button.active { color: #38bdf8; }
 
@@ -31,7 +31,79 @@
         .tab-content.active { display: block; }
         
         .operator-box { background: #334155; padding: 10px; border-radius: 6px; margin-bottom: 8px; font-size: 0.9rem; }
-        .status-box { font-size: 0.9rem; color: #cbd5e1; margin-top: 10px; padding: 10px; background: #0f172a; border-radius: 6px; border: 1px dashed #475569; }
+        
+        /* PLATEAU DE LUDO VISUEL */
+        .ludo-board {
+            width: 100%;
+            max-width: 320px;
+            height: 320px;
+            margin: 15px auto;
+            background: #1e293b;
+            border: 3px solid #475569;
+            border-radius: 8px;
+            display: grid;
+            grid-template-columns: 2fr 1.2fr 2fr;
+            grid-template-rows: 2fr 1.2fr 2fr;
+            position: relative;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+        }
+        .ludo-base {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 10px;
+        }
+        .base-red { background: #ef4444; border-top-left-radius: 5px; }    /* Joueur */
+        .base-green { background: #22c55e; border-top-right-radius: 5px; } /* Bot Koto */
+        .base-blue { background: #3b82f6; border-bottom-left-radius: 5px; }  /* Bot Soa */
+        .base-yellow { background: #eab308; border-bottom-right-radius: 5px; }/* Bot Rabe */
+        
+        .ludo-center {
+            background: #0f172a;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            border: 2px dashed #475569;
+            font-size: 0.85rem;
+            font-weight: bold;
+            color: #38bdf8;
+            text-align: center;
+            padding: 5px;
+        }
+        
+        .pawn-container {
+            display: flex;
+            gap: 6px;
+            background: rgba(0,0,0,0.3);
+            padding: 8px;
+            border-radius: 6px;
+        }
+        .pawn {
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            background: white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.4);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 0.7rem;
+            font-weight: bold;
+            color: #0f172a;
+        }
+        
+        .dice-display {
+            background: #334155;
+            padding: 10px 15px;
+            border-radius: 6px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            margin: 10px 0;
+            text-align: center;
+            letter-spacing: 1px;
+            color: #facc15;
+        }
     </style>
 </head>
 <body>
@@ -47,13 +119,63 @@
         <div id="tab-game" class="tab-content active">
             <div class="card">
                 <h2>Table Ludo Classique (4 Joueurs)</h2>
-                <p>Mise : <strong>2 000 Ar</strong></p>
-                <p>Gain du vainqueur : <strong style="color: #4ade80;">6 000 Ar</strong></p>
-                <p style="font-size: 0.85rem; color: #94a3b8; margin-top: 5px;">Si aucun joueur ne rejoint, des bots (IA) complètent la table.</p>
-                <button class="btn btn-success" id="btn-rejoindre" onclick="rejoindreTable()">Rejoindre la table (2 000 Ar)</button>
+                <p>Mise : <strong>2 000 Ar</strong> | Gain : <strong style="color: #4ade80;">6 000 Ar</strong></p>
+                <p style="font-size: 0.85rem; color: #94a3b8; margin-top: 5px;">Affrontez 3 bots (Koto, Soa, Rabe) sur le plateau !</p>
                 
-                <div class="status-box" id="game-status" style="display: none;">
-                    En attente de joueurs...
+                <!-- PLATEAU DE LUDO -->
+                <div class="ludo-board">
+                    <!-- Base Rouge (Joueur) -->
+                    <div class="ludo-base base-red">
+                        <div class="pawn-container">
+                            <div class="pawn" title="Vous">👤</div>
+                            <div class="pawn" title="Vous">👤</div>
+                        </div>
+                    </div>
+                    <!-- Chemin Haut -->
+                    <div style="background: #334155; border-bottom: 2px solid #475569;"></div>
+                    <!-- Base Verte (Bot Koto) -->
+                    <div class="ludo-base base-green">
+                        <div class="pawn-container">
+                            <div class="pawn">🤖</div>
+                            <div class="pawn">🤖</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Chemin Gauche -->
+                    <div style="background: #334155; border-right: 2px solid #475569;"></div>
+                    <!-- Centre -->
+                    <div class="ludo-center">
+                        <div>🏠 LUDO GASY</div>
+                        <div id="game-turn-info" style="font-size:0.7rem; color:#cbd5e1; margin-top:3px;">En attente</div>
+                    </div>
+                    <!-- Chemin Droite -->
+                    <div style="background: #334155; border-left: 2px solid #475569;"></div>
+
+                    <!-- Base Bleue (Bot Soa) -->
+                    <div class="ludo-base base-blue">
+                        <div class="pawn-container">
+                            <div class="pawn">🤖</div>
+                            <div class="pawn">🤖</div>
+                        </div>
+                    </div>
+                    <!-- Chemin Bas -->
+                    <div style="background: #334155; border-top: 2px solid #475569;"></div>
+                    <!-- Base Jaune (Bot Rabe) -->
+                    <div class="ludo-base base-yellow">
+                        <div class="pawn-container">
+                            <div class="pawn">🤖</div>
+                            <div class="pawn">🤖</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="dice-display" id="dice-box">Dé : 🎲 [ ? ]</div>
+
+                <button class="btn btn-success" id="btn-rejoindre" onclick="rejoindreTable()">Lancer la partie (2 000 Ar)</button>
+                
+                <div class="card" id="game-status-card" style="display: none; margin-top: 15px; background: #0f172a;">
+                    <h3 style="font-size: 0.95rem; color: #38bdf8; margin-bottom: 5px;">Journal de la partie</h3>
+                    <p id="game-status" style="font-size: 0.85rem; color: #cbd5e1;">En attente...</p>
                 </div>
             </div>
         </div>
@@ -64,15 +186,9 @@
                 <h2>Faire un Dépôt</h2>
                 <p style="font-size: 0.9rem; margin-bottom: 10px;">Transférez d'abord l'argent sur nos numéros :</p>
                 
-                <div class="operator-box">
-                    <strong>MVola :</strong> 034 00 000 00 (Nom: Hasam)
-                </div>
-                <div class="operator-box">
-                    <strong>Orange Money :</strong> 032 00 000 00 (Nom: Hasam)
-                </div>
-                <div class="operator-box">
-                    <strong>Airtel Money :</strong> 033 00 000 00 (Nom: Hasam)
-                </div>
+                <div class="operator-box"><strong>MVola :</strong> 034 00 000 00 (Nom: Hasam)</div>
+                <div class="operator-box"><strong>Orange Money :</strong> 032 00 000 00 (Nom: Hasam)</div>
+                <div class="operator-box"><strong>Airtel Money :</strong> 033 00 000 00 (Nom: Hasam)</div>
 
                 <hr style="border: 0; border-top: 1px solid #334155; margin: 15px 0;">
 
@@ -109,19 +225,13 @@
 
     <!-- NAVIGATION BASSE -->
     <nav>
-        <button class="active" onclick="switchTab('game', this)">
-            <span>🎮</span> Jeu
-        </button>
-        <button onclick="switchTab('deposit', this)">
-            <span>💳</span> Dépôt
-        </button>
-        <button onclick="switchTab('withdraw', this)">
-            <span>💸</span> Retrait
-        </button>
+        <button class="active" onclick="switchTab('game', this)"><span>🎮</span> Jeu</button>
+        <button onclick="switchTab('deposit', this)"><span>💳</span> Dépôt</button>
+        <button onclick="switchTab('withdraw', this)"><span>💸</span> Retrait</button>
     </nav>
 
     <script>
-        let userSolde = 4000; // Solde de test
+        let userSolde = 4000; // Solde initial de test
 
         function updateUI() {
             document.getElementById('user-balance').innerText = userSolde.toLocaleString() + ' Ar';
@@ -148,46 +258,55 @@
             updateUI();
 
             let btn = document.getElementById('btn-rejoindre');
+            let statusCard = document.getElementById('game-status-card');
             let statusBox = document.getElementById('game-status');
+            let turnInfo = document.getElementById('game-turn-info');
+            let diceBox = document.getElementById('dice-box');
             
             btn.style.display = 'none';
-            statusBox.style.display = 'block';
-            statusBox.innerHTML = "🔍 Recherche de joueurs réels...";
+            statusCard.style.display = 'block';
+            statusBox.innerHTML = "🔍 Connexion à la table... 3 bots détectés (Koto, Soa, Rabe).";
+            turnInfo.innerText = "Partie en cours...";
 
-            // Étape 1 : Attente de 2 secondes pour faire croire qu'on cherche des joueurs
+            // Séquence animée du jeu sur le plateau
             setTimeout(() => {
-                statusBox.innerHTML = "🤖 Aucun joueur trouvé en ligne. Ajout de 3 bots (Koto, Soa, Rabe)...";
-            }, 2000);
+                diceBox.innerHTML = "🎲 Dé : [ 6 ] -> Koto sort un pion !";
+                statusBox.innerHTML += "<br>🤖 <b>Koto</b> (Vert) lance le dé : fait 6 et sort de sa base.";
+            }, 1500);
 
-            // Étape 2 : Lancement de la partie après 4 secondes
             setTimeout(() => {
-                lancerSimulationPartie();
+                diceBox.innerHTML = "🎲 Dé : [ 4 ] -> C'est votre tour (Rouge)";
+                statusBox.innerHTML += "<br>👤 Vous lancez le dé : <b>4</b>. Vos pions avancent sur le plateau.";
+                turnInfo.innerText = "Tour du Joueur";
+            }, 3000);
+
+            setTimeout(() => {
+                diceBox.innerHTML = "🎲 Dé : [ 5 ] -> Soa (Bleu) avance.";
+                statusBox.innerHTML += "<br>🤖 <b>Soa</b> fait 5 et avance sur le circuit.";
             }, 4500);
-        }
 
-        function lancerSimulationPartie() {
-            let statusBox = document.getElementById('game-status');
-            let btn = document.getElementById('btn-rejoindre');
+            // Résultat final basé sur la règle de protection admin (75% de chance de victoire bot)
+            setTimeout(() => {
+                let securiteAdminChance = 0.75; 
+                let tirageAleatoire = Math.random();
 
-            // SÉCURITÉ ADMIN ("Pour que tu ne dépenses pas trop") :
-            // On attribue 75% de chance de victoire au Bot et 25% de chance au joueur.
-            // Tu peux modifier le chiffre (ex: 0.8 pour 80% de victoires bots).
-            let securiteAdminChance = 0.75; 
-            let tirageAleatoire = Math.random();
+                if (tirageAleatoire < securiteAdminChance) {
+                    // Bot gagne
+                    diceBox.innerHTML = "🎲 Fin de partie !";
+                    turnInfo.innerText = "Victoire de Koto";
+                    statusBox.innerHTML += "<br><br>❌ <b>Partie terminée :</b> Le bot <b>Koto</b> a rentré tous ses pions en premier. Vous avez perdu votre mise de 2 000 Ar.";
+                } else {
+                    // Joueur gagne
+                    userSolde += 6000;
+                    updateUI();
+                    diceBox.innerHTML = "🏆 JACKPOT !";
+                    turnInfo.innerText = "Victoire du Joueur !";
+                    statusBox.innerHTML += "<br><br>🎉 <b>Victoire magistrale !</b> Vous avez rentré tous vos pions en premier ! <span style='color:#4ade80;'>+6 000 Ar</span> ajoutés à votre solde.";
+                }
 
-            if (tirageAleatoire < securiteAdminChance) {
-                // Le Bot gagne -> L'admin garde les 2 000 Ar et ne débourse rien !
-                statusBox.innerHTML = "❌ **Partie terminée !** Le <b>Bot Koto</b> a rentré ses 4 pions en premier.<br>Vous avez perdu votre mise de 2 000 Ar.";
-            } else {
-                // Le joueur gagne -> Il remporte 6 000 Ar
-                userSolde += 6000;
-                updateUI();
-                statusBox.innerHTML = "🎉 **Victoire magistrale !** Vous avez battu les bots et gagné la partie !<br><span style='color:#4ade80;'>+6 000 Ar</span> ajoutés à votre solde.";
-            }
-
-            // Réafficher le bouton pour rejouer
-            btn.style.display = 'block';
-            btn.innerText = "Rejouer une partie (2 000 Ar)";
+                btn.style.display = 'block';
+                btn.innerText = "Rejouer (2 000 Ar)";
+            }, 6500);
         }
 
         function soumettreDepot() {
