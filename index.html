@@ -31,6 +31,7 @@
         .tab-content.active { display: block; }
         
         .operator-box { background: #334155; padding: 10px; border-radius: 6px; margin-bottom: 8px; font-size: 0.9rem; }
+        .status-box { font-size: 0.9rem; color: #cbd5e1; margin-top: 10px; padding: 10px; background: #0f172a; border-radius: 6px; border: 1px dashed #475569; }
     </style>
 </head>
 <body>
@@ -48,14 +49,11 @@
                 <h2>Table Ludo Classique (4 Joueurs)</h2>
                 <p>Mise : <strong>2 000 Ar</strong></p>
                 <p>Gain du vainqueur : <strong style="color: #4ade80;">6 000 Ar</strong></p>
-                <p style="font-size: 0.85rem; color: #94a3b8; margin-top: 5px;">Affrontez 3 autres joueurs en temps réel.</p>
-                <button class="btn btn-success" onclick="rejoindreTable()">Rejoindre la table (2 000 Ar)</button>
-            </div>
-            <div class="card">
-                <h2>Statut du Salon</h2>
-                <p>Joueurs en attente : <span id="waiting-count">1</span>/4</p>
-                <div style="margin-top: 10px; height: 8px; background: #334155; border-radius: 4px; overflow: hidden;">
-                    <div id="progress-bar" style="width: 25%; height: 100%; background: #38bdf8;"></div>
+                <p style="font-size: 0.85rem; color: #94a3b8; margin-top: 5px;">Si aucun joueur ne rejoint, des bots (IA) complètent la table.</p>
+                <button class="btn btn-success" id="btn-rejoindre" onclick="rejoindreTable()">Rejoindre la table (2 000 Ar)</button>
+                
+                <div class="status-box" id="game-status" style="display: none;">
+                    En attente de joueurs...
                 </div>
             </div>
         </div>
@@ -64,7 +62,7 @@
         <div id="tab-deposit" class="tab-content">
             <div class="card">
                 <h2>Faire un Dépôt</h2>
-                <p style="font-size: 0.9rem; margin-bottom: 10px;">Transférez d'abord l'argent sur nos numéros officiels :</p>
+                <p style="font-size: 0.9rem; margin-bottom: 10px;">Transférez d'abord l'argent sur nos numéros :</p>
                 
                 <div class="operator-box">
                     <strong>MVola :</strong> 034 00 000 00 (Nom: Hasam)
@@ -123,8 +121,7 @@
     </nav>
 
     <script>
-        // Gestion de l'argent virtuel en local (en attendant Google Sheets)
-        let userSolde = 4000; // Solde de test initial
+        let userSolde = 4000; // Solde de test
 
         function updateUI() {
             document.getElementById('user-balance').innerText = userSolde.toLocaleString() + ' Ar';
@@ -140,14 +137,57 @@
         }
 
         function rejoindreTable() {
-            if (userSolde >= 2000) {
-                userSolde -= 2000;
-                updateUI();
-                alert("Vous avez rejoint la table ! En attente des autres joueurs...");
-            } else {
+            if (userSolde < 2000) {
                 alert("Solde insuffisant ! Veuillez faire un dépôt de 2 000 Ar.");
                 switchTab('deposit', document.querySelectorAll('nav button')[1]);
+                return;
             }
+
+            // Déduction de la mise
+            userSolde -= 2000;
+            updateUI();
+
+            let btn = document.getElementById('btn-rejoindre');
+            let statusBox = document.getElementById('game-status');
+            
+            btn.style.display = 'none';
+            statusBox.style.display = 'block';
+            statusBox.innerHTML = "🔍 Recherche de joueurs réels...";
+
+            // Étape 1 : Attente de 2 secondes pour faire croire qu'on cherche des joueurs
+            setTimeout(() => {
+                statusBox.innerHTML = "🤖 Aucun joueur trouvé en ligne. Ajout de 3 bots (Koto, Soa, Rabe)...";
+            }, 2000);
+
+            // Étape 2 : Lancement de la partie après 4 secondes
+            setTimeout(() => {
+                lancerSimulationPartie();
+            }, 4500);
+        }
+
+        function lancerSimulationPartie() {
+            let statusBox = document.getElementById('game-status');
+            let btn = document.getElementById('btn-rejoindre');
+
+            // SÉCURITÉ ADMIN ("Pour que tu ne dépenses pas trop") :
+            // On attribue 75% de chance de victoire au Bot et 25% de chance au joueur.
+            // Tu peux modifier le chiffre (ex: 0.8 pour 80% de victoires bots).
+            let securiteAdminChance = 0.75; 
+            let tirageAleatoire = Math.random();
+
+            if (tirageAleatoire < securiteAdminChance) {
+                // Le Bot gagne -> L'admin garde les 2 000 Ar et ne débourse rien !
+                statusBox.innerHTML = "❌ **Partie terminée !** Le <b>Bot Koto</b> a rentré ses 4 pions en premier.<br>Vous avez perdu votre mise de 2 000 Ar.";
+            } else {
+                // Le joueur gagne -> Il remporte 6 000 Ar
+                userSolde += 6000;
+                updateUI();
+                statusBox.innerHTML = "🎉 **Victoire magistrale !** Vous avez battu les bots et gagné la partie !<br><span style='color:#4ade80;'>+6 000 Ar</span> ajoutés à votre solde.";
+            }
+
+            // Réafficher le bouton pour rejouer
+            btn.style.display = 'block';
+            btn.innerText = "Rejouer une partie (2 000 Ar)";
         }
 
         function soumettreDepot() {
@@ -157,8 +197,7 @@
                 alert("Veuillez remplir tous les champs du dépôt.");
                 return;
             }
-            alert("Demande de dépôt envoyée ! L'administrateur va vérifier votre transaction et créditer votre compte.");
-            // Simulation de validation immédiate pour le test (à remplacer par ton Google Apps Script)
+            alert("Demande de dépôt envoyée ! L'administrateur va valider.");
             userSolde += Number(montant);
             updateUI();
         }
@@ -170,12 +209,12 @@
                 return;
             }
             if (montant > userSolde) {
-                alert("Vous n'avez pas assez de solde pour ce retrait.");
+                alert("Vous n'avez pas assez de solde.");
                 return;
             }
             userSolde -= montant;
             updateUI();
-            alert("Demande de retrait enregistrée avec succès ! Vous recevrez l'argent sous peu.");
+            alert("Demande de retrait enregistrée avec succès !");
         }
     </script>
 </body>
