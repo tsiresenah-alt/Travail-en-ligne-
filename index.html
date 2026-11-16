@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ludo Gasy - Arena</title>
+    <title>Ludo Gasy Arena</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
         body { background-color: #0f172a; color: #f8fafc; padding-bottom: 70px; }
@@ -31,78 +31,114 @@
         .tab-content.active { display: block; }
         
         .operator-box { background: #334155; padding: 10px; border-radius: 6px; margin-bottom: 8px; font-size: 0.9rem; }
-        
-        /* PLATEAU DE LUDO VISUEL */
+
+        /* --- STYLE DU PLATEAU DE LUDO FIDÈLE À L'IMAGE --- */
+        .ludo-game-wrapper {
+            background: #1e293b;
+            border: 2px solid #475569;
+            border-radius: 12px;
+            padding: 10px;
+            margin: 15px 0;
+        }
+
+        /* En-têtes joueurs du haut (Computer 1 & Computer 2) */
+        .board-header-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            gap: 5px;
+        }
+        /* En-têtes joueurs du bas (You & Computer 3) */
+        .board-footer-row {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 8px;
+            gap: 5px;
+        }
+
+        .player-hud {
+            background: #0f172a;
+            border: 1px solid #475569;
+            border-radius: 8px;
+            padding: 6px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            flex: 1;
+            font-size: 0.75rem;
+        }
+        .player-hud img, .player-hud .avatar-placeholder {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: #334155;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+        }
+        .hud-info {
+            display: flex;
+            flex-direction: column;
+        }
+        .hud-name { font-weight: bold; color: #f8fafc; font-size: 0.7rem; }
+        .hud-dice { color: #facc15; font-size: 0.75rem; font-weight: bold; }
+
+        /* Le plateau central en croix */
         .ludo-board {
             width: 100%;
             max-width: 320px;
             height: 320px;
-            margin: 15px auto;
-            background: #1e293b;
-            border: 3px solid #475569;
-            border-radius: 8px;
+            margin: 0 auto;
+            background: #0f172a;
+            border: 3px solid #334155;
+            border-radius: 6px;
             display: grid;
             grid-template-columns: 2fr 1.2fr 2fr;
             grid-template-rows: 2fr 1.2fr 2fr;
             position: relative;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.5);
         }
+
         .ludo-base {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 10px;
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            grid-template-rows: repeat(2, 1fr);
+            padding: 12px;
+            gap: 8px;
         }
-        .base-red { background: #ef4444; border-top-left-radius: 5px; }    /* Joueur */
-        .base-green { background: #22c55e; border-top-right-radius: 5px; } /* Bot Koto */
-        .base-blue { background: #3b82f6; border-bottom-left-radius: 5px; }  /* Bot Soa */
-        .base-yellow { background: #eab308; border-bottom-right-radius: 5px; }/* Bot Rabe */
-        
+        .base-red { background: #ef4444; border-top-left-radius: 4px; }    /* Computer 1 */
+        .base-green { background: #22c55e; border-top-right-radius: 4px; } /* Computer 2 */
+        .base-blue { background: #3b82f6; border-bottom-left-radius: 4px; }  /* You */
+        .base-yellow { background: #eab308; border-bottom-right-radius: 4px; }/* Computer 3 */
+
+        .pawn-spot {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.3);
+        }
+
         .ludo-center {
-            background: #0f172a;
+            background: #1e293b;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
             border: 2px dashed #475569;
-            font-size: 0.85rem;
+            font-size: 0.75rem;
             font-weight: bold;
             color: #38bdf8;
             text-align: center;
-            padding: 5px;
+            padding: 2px;
         }
-        
-        .pawn-container {
-            display: flex;
-            gap: 6px;
-            background: rgba(0,0,0,0.3);
-            padding: 8px;
-            border-radius: 6px;
-        }
-        .pawn {
-            width: 22px;
-            height: 22px;
-            border-radius: 50%;
-            background: white;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.4);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 0.7rem;
-            font-weight: bold;
-            color: #0f172a;
-        }
-        
-        .dice-display {
-            background: #334155;
-            padding: 10px 15px;
-            border-radius: 6px;
-            font-size: 1.1rem;
-            font-weight: bold;
-            margin: 10px 0;
-            text-align: center;
-            letter-spacing: 1px;
-            color: #facc15;
+
+        .path-section {
+            background: #1e293b;
+            border: 1px solid #334155;
+            display: grid;
         }
     </style>
 </head>
@@ -120,56 +156,86 @@
             <div class="card">
                 <h2>Table Ludo Classique (4 Joueurs)</h2>
                 <p>Mise : <strong>2 000 Ar</strong> | Gain : <strong style="color: #4ade80;">6 000 Ar</strong></p>
-                <p style="font-size: 0.85rem; color: #94a3b8; margin-top: 5px;">Affrontez 3 bots (Koto, Soa, Rabe) sur le plateau !</p>
                 
-                <!-- PLATEAU DE LUDO -->
-                <div class="ludo-board">
-                    <!-- Base Rouge (Joueur) -->
-                    <div class="ludo-base base-red">
-                        <div class="pawn-container">
-                            <div class="pawn" title="Vous">👤</div>
-                            <div class="pawn" title="Vous">👤</div>
-                        </div>
-                    </div>
-                    <!-- Chemin Haut -->
-                    <div style="background: #334155; border-bottom: 2px solid #475569;"></div>
-                    <!-- Base Verte (Bot Koto) -->
-                    <div class="ludo-base base-green">
-                        <div class="pawn-container">
-                            <div class="pawn">🤖</div>
-                            <div class="pawn">🤖</div>
-                        </div>
-                    </div>
+                <!-- PLATEAU DE LUDO STRUCTURÉ COMME SUR L'IMAGE -->
+                <div class="ludo-game-wrapper">
                     
-                    <!-- Chemin Gauche -->
-                    <div style="background: #334155; border-right: 2px solid #475569;"></div>
-                    <!-- Centre -->
-                    <div class="ludo-center">
-                        <div>🏠 LUDO GASY</div>
-                        <div id="game-turn-info" style="font-size:0.7rem; color:#cbd5e1; margin-top:3px;">En attente</div>
+                    <!-- Ligne haute : Computer 1 & Computer 2[span_5](start_span)[span_5](end_span) -->
+                    <div class="board-header-row">
+                        <div class="player-hud" style="border-color: #ef4444;">
+                            <div class="avatar-placeholder">🤖</div>
+                            <div class="hud-info">
+                                <span class="hud-name" style="color:#ef4444;">COMPUTER 1</span>
+                                <span class="hud-dice" id="dice-c1">🎲 [ 6 ]</span>
+                            </div>
+                        </div>
+                        <div class="player-hud" style="border-color: #22c55e;">
+                            <div class="avatar-placeholder">🤖</div>
+                            <div class="hud-info">
+                                <span class="hud-name" style="color:#22c55e;">COMPUTER 2</span>
+                                <span class="hud-dice" id="dice-c2">🎲 [ 3 ]</span>
+                            </div>
+                        </div>
                     </div>
-                    <!-- Chemin Droite -->
-                    <div style="background: #334155; border-left: 2px solid #475569;"></div>
 
-                    <!-- Base Bleue (Bot Soa) -->
-                    <div class="ludo-base base-blue">
-                        <div class="pawn-container">
-                            <div class="pawn">🤖</div>
-                            <div class="pawn">🤖</div>
+                    <!-- Le Plateau 3x3 -->
+                    <div class="ludo-board">
+                        <!-- Base Rouge (Computer 1) -->
+                        <div class="ludo-base base-red">
+                            <div class="pawn-spot">🔴</div><div class="pawn-spot">🔴</div>
+                            <div class="pawn-spot">🔴</div><div class="pawn-spot">🔴</div>
+                        </div>
+                        <!-- Chemin haut -->
+                        <div class="path-section" style="background:#14532d;"></div>
+                        <!-- Base Verte (Computer 2) -->
+                        <div class="ludo-base base-green">
+                            <div class="pawn-spot">🟢</div><div class="pawn-spot">🟢</div>
+                            <div class="pawn-spot">🟢</div><div class="pawn-spot">🟢</div>
+                        </div>
+                        
+                        <!-- Chemin gauche -->
+                        <div class="path-section" style="background:#7f1d1d;"></div>
+                        <!-- Centre -->
+                        <div class="ludo-center">
+                            <span>🏠</span>
+                            <span id="center-status" style="font-size:0.65rem; color:#facc15;">Prêt</span>
+                        </div>
+                        <!-- Chemin droite -->
+                        <div class="path-section" style="background:#713f12;"></div>
+
+                        <!-- Base Bleue (You) -->
+                        <div class="ludo-base base-blue">
+                            <div class="pawn-spot">🔵</div><div class="pawn-spot">🔵</div>
+                            <div class="pawn-spot">🔵</div><div class="pawn-spot">🔵</div>
+                        </div>
+                        <!-- Chemin bas -->
+                        <div class="path-section" style="background:#1e3a8a;"></div>
+                        <!-- Base Jaune (Computer 3) -->
+                        <div class="ludo-base base-yellow">
+                            <div class="pawn-spot">🟡</div><div class="pawn-spot">🟡</div>
+                            <div class="pawn-spot">🟡</div><div class="pawn-spot">🟡</div>
                         </div>
                     </div>
-                    <!-- Chemin Bas -->
-                    <div style="background: #334155; border-top: 2px solid #475569;"></div>
-                    <!-- Base Jaune (Bot Rabe) -->
-                    <div class="ludo-base base-yellow">
-                        <div class="pawn-container">
-                            <div class="pawn">🤖</div>
-                            <div class="pawn">🤖</div>
+
+                    <!-- Ligne basse : You & Computer 3[span_6](start_span)[span_6](end_span) -->
+                    <div class="board-footer-row">
+                        <div class="player-hud" style="border-color: #3b82f6;">
+                            <div class="avatar-placeholder">👤</div>
+                            <div class="hud-info">
+                                <span class="hud-name" style="color:#3b82f6;">VOUS (YOU)</span>
+                                <span class="hud-dice" id="dice-you">🎲 [ ? ]</span>
+                            </div>
+                        </div>
+                        <div class="player-hud" style="border-color: #eab308;">
+                            <div class="avatar-placeholder">🤖</div>
+                            <div class="hud-info">
+                                <span class="hud-name" style="color:#eab308;">COMPUTER 3</span>
+                                <span class="hud-dice" id="dice-c3">🎲 [ 4 ]</span>
+                            </div>
                         </div>
                     </div>
+
                 </div>
-
-                <div class="dice-display" id="dice-box">Dé : 🎲 [ ? ]</div>
 
                 <button class="btn btn-success" id="btn-rejoindre" onclick="rejoindreTable()">Lancer la partie (2 000 Ar)</button>
                 
@@ -260,53 +326,48 @@
             let btn = document.getElementById('btn-rejoindre');
             let statusCard = document.getElementById('game-status-card');
             let statusBox = document.getElementById('game-status');
-            let turnInfo = document.getElementById('game-turn-info');
-            let diceBox = document.getElementById('dice-box');
+            let centerStatus = document.getElementById('center-status');
             
             btn.style.display = 'none';
             statusCard.style.display = 'block';
-            statusBox.innerHTML = "🔍 Connexion à la table... 3 bots détectés (Koto, Soa, Rabe).";
-            turnInfo.innerText = "Partie en cours...";
+            statusBox.innerHTML = "🔍 Recherche de joueurs... Remplacement par Computer 1, 2 et 3.";
+            centerStatus.innerText = "En cours";
 
-            // Séquence animée du jeu sur le plateau
+            // Séquence animée du jeu
             setTimeout(() => {
-                diceBox.innerHTML = "🎲 Dé : [ 6 ] -> Koto sort un pion !";
-                statusBox.innerHTML += "<br>🤖 <b>Koto</b> (Vert) lance le dé : fait 6 et sort de sa base.";
-            }, 1500);
-
-            setTimeout(() => {
-                diceBox.innerHTML = "🎲 Dé : [ 4 ] -> C'est votre tour (Rouge)";
-                statusBox.innerHTML += "<br>👤 Vous lancez le dé : <b>4</b>. Vos pions avancent sur le plateau.";
-                turnInfo.innerText = "Tour du Joueur";
-            }, 3000);
+                document.getElementById('dice-c1').innerText = "🎲 [ 6 ]";
+                statusBox.innerHTML += "<br>🔴 <b>Computer 1</b> lance 6 et sort un pion.";
+            }, 1200);
 
             setTimeout(() => {
-                diceBox.innerHTML = "🎲 Dé : [ 5 ] -> Soa (Bleu) avance.";
-                statusBox.innerHTML += "<br>🤖 <b>Soa</b> fait 5 et avance sur le circuit.";
-            }, 4500);
+                document.getElementById('dice-you').innerText = "🎲 [ 4 ]";
+                statusBox.innerHTML += "<br>🔵 <b>Vous</b> lancez 4 et avancez vos pions bleus.";
+            }, 2500);
 
-            // Résultat final basé sur la règle de protection admin (75% de chance de victoire bot)
+            setTimeout(() => {
+                document.getElementById('dice-c2').innerText = "🎲 [ 5 ]";
+                document.getElementById('dice-c3').innerText = "🎲 [ 2 ]";
+                statusBox.innerHTML += "<br>🟢 <b>Computer 2</b> et 🟡 <b>Computer 3</b> jouent leur tour.";
+            }, 3800);
+
+            // Résultat final (protection admin : 75% de chance que les bots gagnent pour épargner ton budget)
             setTimeout(() => {
                 let securiteAdminChance = 0.75; 
                 let tirageAleatoire = Math.random();
 
                 if (tirageAleatoire < securiteAdminChance) {
-                    // Bot gagne
-                    diceBox.innerHTML = "🎲 Fin de partie !";
-                    turnInfo.innerText = "Victoire de Koto";
-                    statusBox.innerHTML += "<br><br>❌ <b>Partie terminée :</b> Le bot <b>Koto</b> a rentré tous ses pions en premier. Vous avez perdu votre mise de 2 000 Ar.";
+                    centerStatus.innerText = "Perdu";
+                    statusBox.innerHTML += "<br><br>❌ <b>Fin de partie :</b> <b>Computer 1</b> a rentré ses 4 pions en premier. Vous avez perdu votre mise de 2 000 Ar.";
                 } else {
-                    // Joueur gagne
                     userSolde += 6000;
                     updateUI();
-                    diceBox.innerHTML = "🏆 JACKPOT !";
-                    turnInfo.innerText = "Victoire du Joueur !";
-                    statusBox.innerHTML += "<br><br>🎉 <b>Victoire magistrale !</b> Vous avez rentré tous vos pions en premier ! <span style='color:#4ade80;'>+6 000 Ar</span> ajoutés à votre solde.";
+                    centerStatus.innerText = "Victoire !";
+                    statusBox.innerHTML += "<br><br>🎉 <b>Victoire magistrale !</b> Vous avez battu les ordinateurs ! <span style='color:#4ade80;'>+6 000 Ar</span> ajoutés à votre solde.";
                 }
 
                 btn.style.display = 'block';
                 btn.innerText = "Rejouer (2 000 Ar)";
-            }, 6500);
+            }, 5500);
         }
 
         function soumettreDepot() {
